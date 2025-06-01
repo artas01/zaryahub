@@ -10,9 +10,9 @@ local GameScripts = {
         name = "Ragdoll Engine",
         script = "https://raw.githubusercontent.com/artas01/zaryahub/main/loader.lua"
     },
-    [123456789] = {
+    [92897254421127] = {
         name = "Example Game 1",
-        script = "https://example.com/script1.lua"
+        script = "https://raw.githubusercontent.com/artas01/zaryahub/refs/heads/main/windycityrp"
     },
     [987654321] = {
         name = "Example Game 2",
