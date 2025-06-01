@@ -1,0 +1,228 @@
+getgenv().PenguinFarm = false
+getgenv().SnowmanFarm = false
+getgenv().OrbFarm = false
+getgenv().GnomeFarm = false
+getgenv().MeteorFarm = false
+getgenv().SmartFarm = true
+
+local plr = game.Players.LocalPlayer
+local hrp = plr.Character and plr.Character:WaitForChild("HumanoidRootPart")
+local vim = game:GetService("VirtualInputManager")
+
+local function click()
+    vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+    vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+end
+
+getgenv().connections = getgenv().connections or {}
+local function cleanupconnects()
+    for _, conn in ipairs(getgenv().connections) do
+        if conn.Connected then
+            conn:Disconnect()
+        end
+    end
+    table.clear(getgenv().connections)
+end
+
+local function validOrbs()
+    local count = 0
+    for _, orb in ipairs(workspace.Scene["158967708"]:GetChildren()) do
+        if orb:FindFirstChild("Prefab") then
+            count = count + 1
+        end
+    end
+    return count >= 20
+end
+
+local function validPenguins()
+    return #workspace.NPC.Penguins:GetChildren() >= 2
+end
+
+local function validGnomes()
+    return #workspace.NPC.Gnomes:GetChildren() >= 2
+end
+
+local function doOrbFarm()
+    local orbs = workspace.Scene["158967708"]:GetChildren()
+    local validOrbs = {}
+    for _, orb in ipairs(orbs) do
+        if orb:FindFirstChild("Prefab") then
+            table.insert(validOrbs, orb)
+        end
+    end
+    for i, orb in ipairs(validOrbs) do
+        if not (getgenv().SmartFarm and getgenv().OrbFarm) then break end
+        if orb.CFrame then
+            print(string.format("Collecting orbs [%d/%d]", i, #validOrbs))
+            hrp.CFrame = orb.CFrame
+            task.wait(0.7)
+        end
+    end
+end
+
+local function doPenguinFarm()
+    local penguins = workspace.NPC.Penguins:GetChildren()
+    local canCollect = validPenguins()
+    print("Number of penguins:", #penguins, "canCollect:", tostring(canCollect))
+    if not canCollect then
+        print("Not enough penguins..")
+        return false
+    end
+    
+    for i, penguin in ipairs(penguins) do
+        if not (getgenv().SmartFarm and getgenv().PenguinFarm) then break end
+        if penguin:IsA("Model") and penguin:FindFirstChild("HumanoidRootPart") then
+            print("Collecting penguin:", penguin.Name, string.format("[%d/%d]", i, #penguins))
+            local conn
+            conn = penguin.AncestryChanged:Connect(function(_, parent)
+                if not parent and conn then
+                    conn:Disconnect()
+                    conn = nil
+                end
+            end)
+            table.insert(getgenv().connections, conn)
+            while getgenv().SmartFarm and getgenv().PenguinFarm and penguin.Parent and penguin:FindFirstChild("HumanoidRootPart") do
+                hrp.CFrame = penguin.HumanoidRootPart.CFrame
+                click()
+                task.wait()
+            end
+            cleanupconnects()
+        end
+    end
+    return true
+end
+
+local function doSnowmanFarm()
+    local snowmen = workspace.Ephemeral.AdvCrate:GetChildren()
+    print("Number of snowmen: ", #snowmen)
+    local validSnowmen = {}
+    for _, snowman in ipairs(snowmen) do
+        if snowman:IsA("Model") and snowman:FindFirstChild("TechBox") and snowman.TechBox:FindFirstChild("SnowMan") then
+            table.insert(validSnowmen, snowman)
+        end
+    end
+    for i, snowman in ipairs(validSnowmen) do
+        print(string.format("Collecting snowman [%d/%d]", i, #validSnowmen))
+        local conn
+        conn = snowman.AncestryChanged:Connect(function(_, parent)
+            if not parent and conn then
+                conn:Disconnect()
+                conn = nil
+            end
+        end)
+        table.insert(getgenv().connections, conn)
+        while getgenv().SmartFarm and getgenv().SnowmanFarm and snowman.Parent and snowman.TechBox and snowman.TechBox:FindFirstChild("SnowMan") and snowman.TechBox.SnowMan.Transparency < 1 do
+            hrp.CFrame = snowman.TechBox.CFrame
+            click()
+            task.wait(0.2)
+        end
+        cleanupconnects()
+    end
+end
+
+local function doGnomeFarm()
+    local gnomes = workspace.NPC.Gnomes:GetChildren()
+    local canCollect = validGnomes()
+    print("Number of gnomes:", #gnomes, "canCollect:", tostring(canCollect))
+    if not canCollect then
+        print("Not enough gnomes..")
+        return false
+    end
+    
+    for i, gnome in ipairs(gnomes) do
+        if not (getgenv().SmartFarm and getgenv().GnomeFarm) then break end
+        if gnome:IsA("Model") and gnome:FindFirstChild("HumanoidRootPart") then
+            print("Collecting gnome:", gnome.Name, string.format("[%d/%d]", i, #gnomes))
+            local conn
+            conn = gnome.AncestryChanged:Connect(function(_, parent)
+                if not parent and conn then
+                    conn:Disconnect()
+                    conn = nil
+                end
+            end)
+            table.insert(getgenv().connections, conn)
+            while getgenv().SmartFarm and getgenv().GnomeFarm and gnome.Parent and gnome:FindFirstChild("HumanoidRootPart") do
+                hrp.CFrame = gnome.HumanoidRootPart.CFrame
+                click()
+                task.wait()
+            end
+            cleanupconnects()
+        end
+    end
+    return true
+end
+
+local function doMeteorFarm()
+    print("Starting METEOR farm")
+    local meteor = workspace.Meteors:FindFirstChild("Meteor")
+    if meteor and meteor:FindFirstChild("Health") then
+        local conn
+        conn = meteor.Health.Changed:Connect(function(v)
+            if v <= 0 and conn then
+                conn:Disconnect()
+                conn = nil
+            end
+        end)
+        table.insert(getgenv().connections, conn)
+        while getgenv().SmartFarm and getgenv().MeteorFarm and meteor.Parent and meteor.Health.Value > 0 do
+            hrp.CFrame = CFrame.new(meteor.Position + Vector3.new(0, 5, 0))
+            click()
+            task.wait(0.2)
+        end
+        cleanupconnects()
+    end
+end
+
+local function smartfarm()
+    print("[88] started.")
+    while getgenv().SmartFarm do        
+        print("Checking ORBS")
+        if getgenv().OrbFarm and validOrbs() then
+            doOrbFarm()
+        end
+        
+        if getgenv().PenguinFarm then
+            local collected = doPenguinFarm()
+            if not collected then
+                print("Moving onto GNOMES instead of penguins")
+            end
+        end
+        
+        if getgenv().GnomeFarm then
+            local collected = doGnomeFarm()
+            if not collected then
+                print("Moving onto SNOWMEN instead of gnomes")
+            end
+        end
+        
+        if getgenv().SnowmanFarm then
+            doSnowmanFarm()
+        end
+        
+        if getgenv().MeteorFarm then
+            if not validOrbs() then
+                print("ORBS < 20")
+                doMeteorFarm()
+                doOrbFarm()
+            else
+                print("ORBS > 20")
+            end
+        end
+        task.wait(1)
+    end
+    print("[88] stopped.")
+end
+
+if getgenv().SmartFarm then
+    getgenv().OrbFarm = true
+    getgenv().PenguinFarm = true
+    getgenv().GnomeFarm = true
+    getgenv().SnowmanFarm = true
+    task.spawn(smartfarm)
+else
+    if getgenv().OrbFarm then task.spawn(doOrbFarm) end
+    if getgenv().PenguinFarm then task.spawn(doPenguinFarm) end
+    if getgenv().SnowmanFarm then task.spawn(doSnowmanFarm) end
+    if getgenv().GnomeFarm then task.spawn(doGnomeFarm) end
+    if getgenv().MeteorFarm then task.spawn(doMeteorFarm) end
+end
