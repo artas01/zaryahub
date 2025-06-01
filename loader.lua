@@ -14,9 +14,9 @@ local GameScripts = {
         name = "Windy City RP",
         script = "https://raw.githubusercontent.com/artas01/zaryahub/refs/heads/main/windycityrp"
     },
-    [987654321] = {
-        name = "Example Game 2",
-        script = "https://example.com/script2.lua"
+    [1077961373] = {
+        name = "Giant Simulator",
+        script = "https://raw.githubusercontent.com/artas01/zaryahub/refs/heads/main/giantsimulator_notmine"
     }
 }
 
