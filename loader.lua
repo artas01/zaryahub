@@ -14,7 +14,7 @@ local currentGameId = game.GameId ~= 0 and game.GameId or game.PlaceId
 print("Текущий Game ID:", currentGameId)
 
 if not supportedGameIds[currentGameId] then
-    warn("❌ Этот Game ID не поддерживается:", currentGameId)
+    warn("❌ This Game ID is not supported:", currentGameId)
     return
 end
 
@@ -110,7 +110,7 @@ Instance.new("UICorner", notification).CornerRadius = UDim.new(0, 8)
 Instance.new("UIStroke", notification).Color = Color3.fromRGB(128, 128, 128)
 
 local notifText = Instance.new("TextLabel", notification)
-notifText.Text = "Ссылка на ключ систему была скопирована"
+notifText.Text = "The link to the system key has been copied"
 notifText.Size = UDim2.new(1, -20, 1, -20)
 notifText.Position = UDim2.new(0, 10, 0, 10)
 notifText.BackgroundTransparency = 1
@@ -170,7 +170,7 @@ end)
 checkKeyButton.MouseButton1Click:Connect(function()
     if keyInput.Text:lower() == "pizza" then
         keyInput.Text = ""
-        keyInput.PlaceholderText = "Ключ верный! Загрузка..."
+        keyInput.PlaceholderText = "The key is correct! Loading..."
         keyInput.PlaceholderColor3 = Color3.fromRGB(0, 255, 0)
         
         -- Анимация исчезновения GUI
@@ -190,7 +190,7 @@ checkKeyButton.MouseButton1Click:Connect(function()
         end
     else
         keyInput.Text = ""
-        keyInput.PlaceholderText = "Неверный ключ!"
+        keyInput.PlaceholderText = "Wrong key!"
         keyInput.PlaceholderColor3 = Color3.fromRGB(255, 0, 0)
         wait(2)
         keyInput.PlaceholderText = "Enter your key here..."
