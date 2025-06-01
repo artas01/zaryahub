@@ -7,6 +7,7 @@ local playerGui = player:WaitForChild("PlayerGui")
 -- Проверка Game ID
 local supportedGameIds = {
     [2007050448] = true,  -- Ваш Game ID
+    [92897254421127] = true,
     -- Добавляйте другие ID по необходимости
 }
 
