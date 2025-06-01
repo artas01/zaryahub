@@ -1,0 +1,151 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+-- GUI Setup
+local screenGui = Instance.new("ScreenGui", PlayerGui)
+screenGui.Name = "CleaningJob5AutoFarm"
+screenGui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0, 260, 0, 190)
+frame.Position = UDim2.new(0, 20, 0, 350)
+frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+
+-- Toggle & Speed
+local running = false
+local delaySpeed = 0.3
+
+local toggleButton = Instance.new("TextButton", frame)
+toggleButton.Size = UDim2.new(0.9, 0, 0, 35)
+toggleButton.Position = UDim2.new(0.05, 0, 0, 10)
+toggleButton.BackgroundColor3 = Color3.fromRGB(255, 170, 0)
+toggleButton.TextColor3 = Color3.new(1, 1, 1)
+toggleButton.Text = "CleaningJob5 Farm [OFF]"
+toggleButton.Font = Enum.Font.Gotham
+toggleButton.TextSize = 14
+Instance.new("UICorner", toggleButton).CornerRadius = UDim.new(0, 8)
+
+-- Slider Label
+local sliderLabel = Instance.new("TextLabel", frame)
+sliderLabel.Size = UDim2.new(0.9, 0, 0, 20)
+sliderLabel.Position = UDim2.new(0.05, 0, 0, 50)
+sliderLabel.BackgroundTransparency = 1
+sliderLabel.TextColor3 = Color3.new(1, 1, 1)
+sliderLabel.Text = "Speed: 0.3s"
+sliderLabel.Font = Enum.Font.Gotham
+sliderLabel.TextSize = 14
+
+-- Slider
+local slider = Instance.new("TextButton", frame)
+slider.Size = UDim2.new(0.9, 0, 0, 20)
+slider.Position = UDim2.new(0.05, 0, 0, 70)
+slider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+slider.Text = ""
+Instance.new("UICorner", slider).CornerRadius = UDim.new(0, 6)
+
+local sliderFill = Instance.new("Frame", slider)
+sliderFill.Size = UDim2.new(0.3, 0, 1, 0)
+sliderFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+sliderFill.BorderSizePixel = 0
+Instance.new("UICorner", sliderFill).CornerRadius = UDim.new(0, 6)
+
+local dragging = false
+slider.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+	end
+end)
+slider.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local x = math.clamp((input.Position.X - slider.AbsolutePosition.X) / slider.AbsoluteSize.X, 0, 1)
+		sliderFill.Size = UDim2.new(x, 0, 1, 0)
+		delaySpeed = math.floor(((x * 2) + 0.1) * 100) / 100
+		sliderLabel.Text = "Speed: " .. tostring(delaySpeed) .. "s"
+	end
+end)
+
+-- Dynamic prompt scan
+local function getCurrentPrompts()
+	local job = workspace:FindFirstChild("JobSystem") and workspace.JobSystem:FindFirstChild("CleaningJob5")
+	if not job then return {} end
+
+	local found = {}
+	for _, obj in ipairs(job:GetDescendants()) do
+		if obj:IsA("ProximityPrompt") then
+			table.insert(found, obj)
+		end
+	end
+	return found
+end
+
+-- Loop
+toggleButton.MouseButton1Click:Connect(function()
+	running = not running
+	toggleButton.Text = running and "CleaningJob5 Farm [ON]" or "CleaningJob5 Farm [OFF]"
+
+	if running then
+		task.spawn(function()
+			while running do
+				local prompts = getCurrentPrompts()
+				for _, prompt in ipairs(prompts) do
+					if not running then break end
+					local part = prompt.Parent
+					if part and part:IsA("BasePart") then
+						local char = player.Character or player.CharacterAdded:Wait()
+						local hrp = char:WaitForChild("HumanoidRootPart")
+						hrp.CFrame = part.CFrame + Vector3.new(0, 3, 0)
+						task.wait(0.2)
+						fireproximityprompt(prompt)
+						task.wait(delaySpeed)
+					end
+				end
+				task.wait(delaySpeed)
+			end
+		end)
+	end
+end)
+
+-- Make Prompts Instant Button
+local instantButton = Instance.new("TextButton", frame)
+instantButton.Size = UDim2.new(0.9, 0, 0, 25)
+instantButton.Position = UDim2.new(0.05, 0, 0, 100)
+instantButton.BackgroundColor3 = Color3.fromRGB(0, 200, 200)
+instantButton.TextColor3 = Color3.new(1, 1, 1)
+instantButton.Text = "Make Prompts Instant"
+instantButton.Font = Enum.Font.Gotham
+instantButton.TextSize = 14
+Instance.new("UICorner", instantButton).CornerRadius = UDim.new(0, 8)
+
+instantButton.MouseButton1Click:Connect(function()
+	for _, v in ipairs(workspace:GetDescendants()) do
+		if v:IsA("ProximityPrompt") then
+			v.HoldDuration = 0
+		end
+	end
+end)
+
+-- Unload Button
+local unloadButton = Instance.new("TextButton", frame)
+unloadButton.Size = UDim2.new(0.9, 0, 0, 30)
+unloadButton.Position = UDim2.new(0.05, 0, 0, 130)
+unloadButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+unloadButton.TextColor3 = Color3.new(1, 1, 1)
+unloadButton.Text = "Unload"
+unloadButton.Font = Enum.Font.Gotham
+unloadButton.TextSize = 14
+Instance.new("UICorner", unloadButton).CornerRadius = UDim.new(0, 8)
+
+unloadButton.MouseButton1Click:Connect(function()
+	running = false
+	screenGui:Destroy()
+end)
