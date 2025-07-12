@@ -18,6 +18,10 @@ local GameScripts = {
         name = "Giant Simulator",
         script = "https://raw.githubusercontent.com/artas01/zaryahub/refs/heads/main/giantsimulator_notmine"
     }
+    [18207529184] = {
+        name = "Become a Plane and Fly",
+        script = "https://raw.githubusercontent.com/artas01/zaryahub/refs/heads/main/become%20a%20plane%20and%20fly.lua"
+    }
 }
 
 -- Получаем текущий Game ID
