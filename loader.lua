@@ -12,11 +12,11 @@ local GameScripts = {
     },
     [7523893339] = {
         name = "Windy City RP",
-        script = "https://raw.githubusercontent.com/artas01/zaryahub/refs/heads/main/windycityrp"
+        script = "https://raw.githubusercontent.com/artas01/zaryahub/refs/heads/main/windycityrp.lua"
     },
     [1077961373] = {
         name = "Giant Simulator",
-        script = "https://raw.githubusercontent.com/artas01/zaryahub/refs/heads/main/giantsimulator_notmine"
+        script = "https://raw.githubusercontent.com/artas01/zaryahub/refs/heads/main/giantsimulator_notmine.lua"
     }
     [18207529184] = {
         name = "Become a Plane and Fly",
